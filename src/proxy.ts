@@ -33,8 +33,8 @@ export default async function proxy(req: NextRequest) {
 
 export const config = {
   matcher: [
-    // Semua halaman KECUALI: halaman masuk/daftar, API (dengan guard sendiri),
-    // aset statis Next, dan aset publik aplikasi.
-    '/((?!login|daftar|api|_next/static|_next/image|_next/webpack-hmr|favicon.ico|icon.png|robots.txt|logo-kubar.png|logo-kubar-full.png|logo-mark.png|logo-full.png|kubar-shield.svg|manifest.webmanifest|sitemap.xml).*)',
+    // Semua halaman KECUALI: halaman masuk/daftar/panduan (publik), API (dengan
+    // guard sendiri), aset statis Next, dan aset publik aplikasi.
+    '/((?!login|daftar|panduan|api|_next/static|_next/image|_next/webpack-hmr|favicon.ico|icon.png|icon.svg|robots.txt|logo-kubar.png|logo-kubar-full.png|logo-mark.png|logo-full.png|kubar-shield.svg|manifest.webmanifest|sitemap.xml).*)',
   ],
 }

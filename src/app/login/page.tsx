@@ -5,7 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { signIn } from 'next-auth/react'
-import { Loader2, Lock, Mail } from 'lucide-react'
+import { BookOpen, Loader2, Lock, Mail } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -151,6 +151,13 @@ export default function LoginPage() {
             Belum punya akun?{' '}
             <Link href="/daftar" className="font-semibold text-primary hover:underline">
               Daftar Akun
+            </Link>
+          </p>
+          <p className="mt-2 text-center text-sm text-muted-foreground">
+            Baru pertama kali memakai platform?{' '}
+            <Link href="/panduan" className="inline-flex items-center gap-1 font-semibold text-primary hover:underline">
+              <BookOpen className="h-3.5 w-3.5" />
+              Baca Panduan Penggunaan
             </Link>
           </p>
         </div>

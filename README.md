@@ -80,6 +80,19 @@ Semua transisi status divalidasi per peran + status sumber di server (API guard)
   bukan sekadar "email/sandi salah".
 - Kartu pengingat muncul di dashboard operator saat ada pendaftaran menunggu.
 
+### Panduan Penggunaan Terpadu (v2.3)
+- Halaman publik **`/panduan`** (tautan dari halaman Masuk dan bilah samping bagian
+  **Akun Saya**) — buku saku digital penggunaan platform.
+- **Tab per peran**: Alur Umum (+ akun demo), **Asesi**, **Operator Kredensial**,
+  **Asesor**, **Tim Kredensial** (Ketua Tim per profesi v2.1), **Pimpinan Faskes**,
+  dan **Tanya Jawab** (FAQ Accordion).
+- Tiap peran berisi langkah bernomor sesuai menu asli, chip "Menu: …", daftar menu
+  bilah samping, legenda Kode Diminta/Kode Rekomendasi, dan tips penting.
+- Tab peran dipilih otomatis mengikuti sesi pengguna yang sedang masuk
+  (atau tautan langsung `?peran=asesi|operator|asesor|tim|pimpinan`).
+- Alur 8 tahap divisualkan, tombol Cetak tersedia, seluruhnya mengikuti tema
+  hijau lambang Kutai Barat; halaman tetap publik (dikecualikan pada proxy).
+
 ## Tumpuan Teknologi
 - **Next.js 16** (App Router) + **TypeScript**
 - **Tailwind CSS 4** + shadcn/ui

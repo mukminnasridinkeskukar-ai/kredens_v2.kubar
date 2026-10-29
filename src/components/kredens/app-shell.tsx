@@ -25,6 +25,7 @@ import {
   Database,
   NotebookPen,
   BookCheck,
+  BookOpen,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -302,6 +303,16 @@ function SidebarContent({
           Akun Saya
         </p>
         <NavLink item={{ label: 'Profil dan Keamanan', href: '/akun-saya', icon: UserCircle }} onNavigate={onNavigate} />
+        {/* v2.3 — Panduan Penggunaan: buka di tab baru agar sesi aplikasi tak tertutup */}
+        <a
+          href="/panduan"
+          target="_blank"
+          rel="noreferrer"
+          className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground/70 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground min-h-[44px]"
+        >
+          <BookOpen className="h-4.5 w-4.5 shrink-0" />
+          <span className="truncate">Panduan Penggunaan</span>
+        </a>
         <button
           onClick={() => void keluarKeSitusUtama()}
           className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-red-600 transition-colors hover:bg-red-50 min-h-[44px]"
