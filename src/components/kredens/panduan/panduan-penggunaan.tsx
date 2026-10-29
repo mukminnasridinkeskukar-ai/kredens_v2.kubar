@@ -26,7 +26,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { APP_NAME, APP_FULL_NAME } from '@/lib/constants'
-import { AKUN_DEMO, PERAN_PANDUAN } from './data'
+import { PERAN_PANDUAN } from './data'
 import { AlurVisual, BagianFaq, KartuRingkas, PeranGuide } from './bagian'
 
 // Pemetaan peran sesi -> id tab panduan
@@ -218,22 +218,6 @@ export function PanduanPenggunaan() {
                 judul="Foto Profil Akun (v2.3)"
                 isi="Semua peran dapat memasang foto: buka Akun Saya, ketuk ikon kamera pada kartu identitas, pilih foto JPG/PNG/WebP — otomatis dikecilkan ke 512px sebelum disimpan. Foto tampil di bilah samping, pojok kanan atas, dan dapat diganti/hapus kapan saja."
               />
-            </div>
-
-            <div className="overflow-hidden rounded-xl border bg-card">
-              <p className="border-b bg-muted/60 px-4 py-2.5 text-sm font-semibold text-foreground">
-                Akun Demo (kata sandi semua akun: kredens123)
-              </p>
-              <table className="w-full text-sm">
-                <tbody>
-                  {AKUN_DEMO.map((a) => (
-                    <tr key={a.email} className="border-b last:border-b-0">
-                      <td className="px-4 py-2.5 font-medium text-foreground">{a.email}</td>
-                      <td className="px-2 py-2.5 text-muted-foreground">{a.peran}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
             </div>
 
             <Card className="border">

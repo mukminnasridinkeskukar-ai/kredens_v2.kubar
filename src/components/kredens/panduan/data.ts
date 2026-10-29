@@ -284,16 +284,3 @@ export const FAQ_PANDUAN: { q: string; a: string }[] = [
     a: 'Bisa. Superadmin dapat menambahkan hingga tiga fungsi tambahan pada satu akun: Asesor, Pimpinan Fasyankes, dan/atau Ketua Tim Kredensial. Menu fungsi tambahan muncul di bagian Fungsi Tambahan bilah samping tanpa perlu keluar-masuk ulang.',
   },
 ]
-
-// ---------- Akun demo ----------
-export const AKUN_DEMO: { email: string; peran: string }[] = [
-  { email: 'asesi@kredens.go.id', peran: 'Asesi (+ contoh fungsi tambahan Asesor & Pimpinan Fasyankes)' },
-  { email: 'operator@kredens.go.id', peran: 'Operator Kredensial' },
-  { email: 'asesor@kredens.go.id', peran: 'Asesor' },
-  { email: 'ketuatim@kredens.go.id', peran: 'Ketua Tim Kredensial — profesi Dokter' },
-  { email: 'ketuatim.perawat@kredens.go.id', peran: 'Ketua Tim Kredensial — profesi Perawat' },
-  { email: 'mitra@kredens.go.id', peran: 'Mitra Bestari' },
-  { email: 'pimpinan@kredens.go.id', peran: 'Pimpinan Fasyankes' },
-  { email: 'kadis@kredens.go.id', peran: 'Kepala Dinas Kesehatan' },
-  { email: 'superadmin@kredens.go.id', peran: 'Superadmin' },
-]

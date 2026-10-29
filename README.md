@@ -83,7 +83,7 @@ Semua transisi status divalidasi per peran + status sumber di server (API guard)
 ### Panduan Penggunaan Terpadu (v2.3)
 - Halaman publik **`/panduan`** (tautan dari halaman Masuk dan bilah samping bagian
   **Akun Saya**) — buku saku digital penggunaan platform.
-- **Tab per peran**: Alur Umum (+ akun demo), **Asesi**, **Operator Kredensial**,
+- **Tab per peran**: Alur Umum, **Asesi**, **Operator Kredensial**,
   **Asesor**, **Tim Kredensial** (Ketua Tim per profesi v2.1), **Pimpinan Faskes**,
   dan **Tanya Jawab** (FAQ Accordion).
 - Tiap peran berisi langkah bernomor sesuai menu asli, chip "Menu: …", daftar menu
