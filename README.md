@@ -2,6 +2,10 @@
 
 **Tata Kelola Kredensial Tenaga Medis dan Tenaga Kesehatan Kabupaten Kutai Barat**
 
+> Nama teknis proyek: **`kredensv2kubar`** (huruf kecil, tanpa titik/garis) — dipakai pada
+> nama paket `package.json`, nama repo GitHub, dan nama proyek Vercel
+> (`https://kredensv2kubar.vercel.app`). Nama tampilan di layar: **KREDENS v2.kubar**.
+
 Platform satu pintu untuk mengelola proses kredensialing tenaga medis dan tenaga kesehatan di lingkungan Dinas Kesehatan Kabupaten Kutai Barat — mulai dari pengajuan, biodata dan formulir, penilaian tim kredensial, rekomendasi Kepala Dinas Kesehatan, hingga Surat Penugasan Klinis (SPK) dan Rincian Kewenangan Klinis (RKK).
 
 ---
@@ -134,25 +138,33 @@ Kata sandi seluruh akun demo: **kredens123**
 ```bash
 git init
 git add .
-git commit -m "KREDENS: platform kredensial tenaga medis & kesehatan Kubar"
+git commit -m "KREDENS v2.kubar: platform kredensial tenaga medis & kesehatan Kutar"
 git branch -M main
-git remote add origin https://github.com/<username>/kredens.git
+git remote add origin https://github.com/<username>/kredensv2kubar.git
 git push -u origin main
 ```
 
+> Gunakan nama repo **`kredensv2kubar`** (huruf kecil, tanpa titik/garis) agar
+> konsisten dengan URL produksi.
+
 ### 3. Import ke Vercel
-1. Masuk [vercel.com](https://vercel.com) → **Add New → Project** → pilih repositori GitHub Anda.
-2. Framework preset terdeteksi otomatis (**Next.js**). Biarkan pengaturan build default.
+1. Masuk [vercel.com](https://vercel.com) → **Add New → Project** → pilih repositori GitHub `kredensv2kubar`.
+2. Framework preset terdeteksi otomatis (**Next.js**). **Biarkan Build Command bawaan** —
+   `vercel.json` mengarahkan ke `scripts/vercel-build.mjs` yang membangun dengan **webpack**
+   (bukan Turbopack) dan membersihkan cache `.next` otomatis.
+   > ⚠️ Jangan mengganti Build Command ke `next build` biasa: bundler Turbopack bawaan
+   > Next.js 16 panik saat build (*Dependency tracking is disabled so invalidation is not
+   > allowed*) sehingga deployment selalu gagal. Perbaikan ini masuk di **v2.2**.
 3. Buka **Environment Variables**, tambahkan:
    | Key | Value |
    |-----|-------|
-   | `DATABASE_URL` | connection string Neon (`postgresql://...sslmode=require`) |
-   | `NEXTAUTH_SECRET` | string acak 32+ karakter (`openssl rand -hex 32`) |
-   | `NEXTAUTH_URL` | `https://<nama-project>.vercel.app` |
+   | `DATABASE_URL` | `postgresql://neondb_owner:npg_SydNvtge40RY@ep-late-morning-a1m0ql28-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require` |
+   | `NEXTAUTH_SECRET` | `324d783744728d949132525c95b314c9` |
+   | `NEXTAUTH_URL` | `https://kredensv2kubar.vercel.app` |
 4. **Deploy**.
 
 ### 4. Auto-setup Database (sekali saja setelah deploy)
-Buka **`https://<nama-project>.vercel.app/api/setup`** satu kali di browser.
+Buka **`https://kredensv2kubar.vercel.app/api/setup`** satu kali di browser.
 Endpoint ini otomatis:
 1. Membuat seluruh tabel (DDL PostgreSQL, idempoten — aman dibuka ulang).
 2. Mengisi 7 akun demo + data contoh bila database masih kosong.
@@ -161,7 +173,7 @@ Hasil `"ok": true` berarti database siap. Selain itu, **percobaan login pertama*
 juga memicu setup yang sama (agak lambat ±10–30 detik pada percobaan pertama — normal).
 
 ### 5. Selesai
-Aplikasi aktif di `https://<nama-project>.vercel.app`. Setiap `git push` ke `main` akan memicu deploy ulang otomatis.
+Aplikasi aktif di **https://kredensv2kubar.vercel.app**. Setiap `git push` ke `main` akan memicu deploy ulang otomatis.
 
 ### Cara kerja pemilihan skema Prisma (otomatis)
 Proyek memuat dua skema Prisma: `prisma/schema.prisma` (SQLite, pratinjau lokal) dan `prisma/schema.postgres.prisma` (PostgreSQL/Neon, produksi). Hook `postinstall` (`scripts/prisma-generate.mjs`) memeriksa `DATABASE_URL` pada fase build:
@@ -171,7 +183,7 @@ Proyek memuat dua skema Prisma: `prisma/schema.prisma` (SQLite, pratinjau lokal)
 Dengan begitu build Vercel **selalu** menghasilkan client yang cocok dengan database produksi tanpa konfigurasi tambahan. Bila ingin memaksa manual, atur Build Command di Vercel:
 
 ```bash
-npx prisma generate --schema prisma/schema.postgres.prisma && next build
+npx prisma generate --schema prisma/schema.postgres.prisma && npx next build --webpack
 ```
 
 > **Penting Vercel + Neon:** NextAuth berjalan dengan strategi **JWT** sehingga tidak memerlukan tabel sesi; Prisma Client berjalan normal di runtime Node.js Vercel. Untuk koneksi lebih efisien pada skala besar, pertimbangkan *pooled connection string* Neon (`...-pooler...`) pada `DATABASE_URL`.

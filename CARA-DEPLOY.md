@@ -1,21 +1,26 @@
-# CARA UPLOAD KREDENS KE GITHUB & DEPLOY KE VERCEL
+# CARA UPLOAD KREDENS v2.kubar KE GITHUB & DEPLOY KE VERCEL
 
 Panduan ini untuk pemula. Ikuti pelan-pelan, satu per satu.
 Total waktu: sekitar 15 menit.
+
+> Nama teknis proyek: **kredensv2kubar** (huruf kecil, tanpa titik/garis —
+> format ini yang dipakai untuk nama repo GitHub, nama proyek Vercel,
+> dan nama paket di package.json). Nama tampilan di layar tetap
+> **KREDENS v2.kubar**.
 
 ---
 
 ## BAGIAN 1 — UPLOAD KE GITHUB
 
 ### Langkah 1: Ekstrak file ZIP ini
-1. Klik kanan file `KREDENS-github.zip` → **Extract All / Ekstrak Semua**.
-2. Akan muncul folder bernama `kredens` yang berisi banyak file.
+1. Klik kanan file ZIP `kredensv2kubar` → **Extract All / Ekstrak Semua**.
+2. Akan muncul folder berisi banyak file proyek.
 
 ### Langkah 2: Buat repositori baru di GitHub
 1. Buka browser, masuk ke **https://github.com** (daftar/log in dulu bila belum punya akun).
 2. Klik tombol **+** di pojok kanan atas → pilih **New repository**.
 3. Isi:
-   - Repository name: `kredens`
+   - Repository name: `kredensv2kubar` (huruf kecil semua, tanpa spasi/titik)
    - Pilih **Private** (disarankan, karena berisi data pegawai).
 4. Klik **Create repository**.
 
@@ -61,7 +66,12 @@ Total waktu: sekitar 15 menit.
 ### Langkah 1: Import proyek
 1. Buka **https://vercel.com** → **Sign Up / Log in dengan GitHub**.
 2. Klik **Add New → Project**.
-3. Cari repositori `kredens` → klik **Import**.
+3. Cari repositori `kredensv2kubar` → klik **Import**.
+4. **Penting (sudah otomatis di v2.2):** Build Command memakai
+   `scripts/vercel-build.mjs` yang membangun aplikasi dengan **webpack**.
+   Jangan mengganti Build Command ke `next build` biasa — bundler Turbopack
+   bawaan Next.js 16 panik saat build (error *Dependency tracking is
+   disabled so invalidation is not allowed*) dan deployment gagal.
 
 ### Langkah 2: Isi Environment Variables
 Sebelum menekan Deploy, buka bagian **Environment Variables**,
@@ -69,12 +79,13 @@ lalu tambahkan 3 baris ini:
 
 | Name | Value |
 |------|-------|
-| `DATABASE_URL` | tempel connection string Neon dari Bagian 2 |
-| `NEXTAUTH_SECRET` | tulisan acak panjang, contoh di bawah |
-| `NEXTAUTH_URL` | `https://kredens.vercel.app` (ganti sesuai nama project Anda) |
+| `DATABASE_URL` | `postgresql://neondb_owner:npg_SydNvtge40RY@ep-late-morning-a1m0ql28-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require` |
+| `NEXTAUTH_SECRET` | `324d783744728d949132525c95b314c9` |
+| `NEXTAUTH_URL` | `https://kredensv2kubar.vercel.app` |
 
-**Cara membuat NEXTAUTH_SECRET:** buka https://generate-secret.vercel.app/32
-lalu copy hasilnya dan tempel sebagai value.
+> Nilai di atas adalah nilai produksi yang sudah disiapkan — salin persis.
+> Bila suatu saat ganti nama proyek Vercel, sesuaikan `NEXTAUTH_URL`
+> (harus sama persis dengan alamat situs, tanpa garis miring di akhir).
 
 ### Langkah 3: Deploy
 1. Klik tombol **Deploy**.
@@ -83,7 +94,7 @@ lalu copy hasilnya dan tempel sebagai value.
 
 ### Langkah 4: Isi database (sekali saja, ±1 menit)
 1. Di browser, buka alamat aplikasi Anda ditambah `/api/setup`,
-   contoh: `https://kredens.vercel.app/api/setup`
+   contoh: `https://kredensv2kubar.vercel.app/api/setup`
 2. Tunggu sampai muncul tulisan `"ok": true` (artinya tabel + akun demo
    sudah dibuat otomatis di database Neon).
 3. Selesai — tidak perlu menginstal apa pun di komputer.
@@ -160,6 +171,12 @@ Setiap tahap otomatis terlihat di timeline asesi.
 ## MASALAH UMUM (TROUBLESHOOTING)
 
 **1. Deploy gagal / error saat build di Vercel**
+- **v2.2 sudah memperbaiki penyebab utamanya:** panic Turbopack
+  (`TurbopackInternalError: Dependency tracking is disabled so invalidation
+  is not allowed`). `scripts/vercel-build.mjs` kini otomatis membersihkan
+  cache `.next` dan membangun dengan `next build --webpack`.
+- Pastikan Build Command di Vercel TIDAK diubah/ditimpa — biarkan memakai
+  `vercel.json` dari proyek.
 - Pastikan 3 Environment Variables sudah terisi dengan benar
   (tanpa spasi berlebih, tanpa tanda kutip).
 - Buka tab **Deployments** → klik deployment merah → baca **Build Logs**
@@ -167,7 +184,7 @@ Setiap tahap otomatis terlihat di timeline asesi.
 
 **2. Halaman login muncul tapi tidak bisa masuk**
 - Pastikan `NEXTAUTH_URL` sama persis dengan alamat situs Anda
-  (mis. `https://kredens.vercel.app`, tanpa garis miring di akhir).
+  (mis. `https://kredensv2kubar.vercel.app`, tanpa garis miring di akhir).
 - Pastikan `NEXTAUTH_SECRET` sudah diisi.
 
 **3. Login gagal 401 / "Email atau kata sandi tidak sesuai" padahal kata sandi benar**
