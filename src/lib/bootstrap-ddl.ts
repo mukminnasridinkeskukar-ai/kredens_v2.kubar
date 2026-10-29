@@ -17,6 +17,9 @@ export const DDL_POSTGRES: string[] = [
     "jabatan" TEXT,
     "instansi" TEXT,
     "telepon" TEXT,
+    "foto" BYTEA,
+    "fotoTipe" TEXT,
+    "fotoPada" TIMESTAMP(3),
     "isActive" BOOLEAN NOT NULL DEFAULT true,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -251,6 +254,9 @@ export const DDL_POSTGRES: string[] = [
   `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "sandiTersimpan" TEXT`, // v1.3.0
   `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "peranEkstra" TEXT`, // v2.1 fungsi tambahan akun
   `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "profesi" TEXT`, // v2.1 profesi ketua tim kredensial
+  `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "foto" BYTEA`, // v2.3 foto profil akun
+  `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "fotoTipe" TEXT`, // v2.3 tipe mime foto profil
+  `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "fotoPada" TIMESTAMP(3)`, // v2.3 waktu unggah foto profil
   `ALTER TABLE "RekomendasiTim" ADD COLUMN IF NOT EXISTS "anggotaNama2" TEXT`, // v2.1 anggota tim 2
   `ALTER TABLE "RekomendasiTim" ADD COLUMN IF NOT EXISTS "anggotaNama3" TEXT`, // v2.1 anggota tim 3
   `ALTER TABLE "AsesiProfile" ADD COLUMN "tempatKerjaId" TEXT`,

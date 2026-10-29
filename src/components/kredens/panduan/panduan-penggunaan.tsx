@@ -57,22 +57,29 @@ export function PanduanPenggunaan() {
 
   useEffect(() => {
     // Pilih tab awal dari ?peran= (tautan langsung), lalu dari sesi aktif.
-    const param = new URLSearchParams(window.location.search).get('peran')
-    if (param && PERAN_PANDUAN.some((p) => p.id === param)) {
-      setTab(param)
-    }
+    // setState dilakukan dalam callback (defer), bukan sinkron di badan
+    // efek, agar tidak memicu render berantai (aturan lint react-hooks).
+    let paramTab: string | null = null
+    const t = setTimeout(() => {
+      const param = new URLSearchParams(window.location.search).get('peran')
+      if (param && PERAN_PANDUAN.some((p) => p.id === param)) {
+        paramTab = param
+        setTab(param)
+      }
+    }, 0)
     fetch('/api/auth/session')
       .then((r) => (r.ok ? r.json() : null))
       .then((s: { user?: { role?: string } } | null) => {
         const role = s?.user?.role
         if (!role) return
         setSesiRole(role)
-        if (!param) {
+        if (!paramTab) {
           const idTab = PERAN_KE_TAB[role]
           if (idTab) setTab(idTab)
         }
       })
       .catch(() => {})
+    return () => clearTimeout(t)
   }, [])
 
   const ikonPeran = (id: string) => IKON_TAB[id] ?? BookOpen
@@ -194,7 +201,7 @@ export function PanduanPenggunaan() {
               <AlurVisual />
             </div>
 
-            <div className="grid gap-4 md:grid-cols-3">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
               <KartuRingkas
                 judul="Masuk ke Aplikasi"
                 isi="Buka halaman Masuk, tulis email resmi dan kata sandi, lalu tekan Masuk. Percobaan pertama bisa lambat ±10–30 detik karena sistem menyiapkan database — normal dan hanya sekali. Sesi berlaku maksimal 8 jam dan berhenti otomatis setelah 15 menit diam."
@@ -206,6 +213,10 @@ export function PanduanPenggunaan() {
               <KartuRingkas
                 judul="Satu Akun, Banyak Fungsi (v2.1)"
                 isi="Superadmin dapat menambahkan hingga tiga fungsi tambahan pada satu akun: Asesor, Pimpinan Fasyankes, dan/atau Ketua Tim Kredensial. Menu fungsi tambahan tampil di bagian Fungsi Tambahan bilah samping tanpa keluar-masuk ulang."
+              />
+              <KartuRingkas
+                judul="Foto Profil Akun (v2.3)"
+                isi="Semua peran dapat memasang foto: buka Akun Saya, ketuk ikon kamera pada kartu identitas, pilih foto JPG/PNG/WebP — otomatis dikecilkan ke 512px sebelum disimpan. Foto tampil di bilah samping, pojok kanan atas, dan dapat diganti/hapus kapan saja."
               />
             </div>
 

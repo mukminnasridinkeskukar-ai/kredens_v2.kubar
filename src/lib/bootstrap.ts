@@ -42,9 +42,10 @@ import {
  *   '3' = v1.2.2 — tabel penanda _kredens_meta ditambahkan
  *   '4' = v1.3.0 — kolom User.sandiTersimpan (salinan sandi terenkripsi)
  *   '5' = v2.1 — User.peranEkstra + User.profesi + RekomendasiTim.anggotaNama2/3
+ *   '6' = v2.3 — User.foto + User.fotoTipe + User.fotoPada (foto profil akun)
  */
 const KEY_VERSI = 'schema_version'
-export const VERSI_SKEMA = '5'
+export const VERSI_SKEMA = '6'
 
 /** Penyebab kegagalan bootstrap terakhir (untuk diagnosis jarak jauh via /api/setup). */
 let galatTerakhir: string | null = null

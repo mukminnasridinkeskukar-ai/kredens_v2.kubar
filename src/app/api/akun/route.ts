@@ -18,6 +18,10 @@ export async function GET() {
       jabatan: true,
       instansi: true,
       telepon: true,
+      // v2.3 — metadata foto profil (isi gambarnya tidak dikirim di sini;
+      // diambil terpisah via GET /api/akun/foto agar payload tetap ringan)
+      fotoTipe: true,
+      fotoPada: true,
       createdAt: true,
     },
   })

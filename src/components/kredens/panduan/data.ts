@@ -248,6 +248,10 @@ export const PERAN_PANDUAN: PanduanPeran[] = [
 // ---------- FAQ ----------
 export const FAQ_PANDUAN: { q: string; a: string }[] = [
   {
+    q: 'Bagaimana cara memasang atau mengganti foto profil? (v2.3)',
+    a: 'Buka menu Akun Saya → Profil dan Keamanan, lalu ketuk ikon kamera pada kartu identitas di bagian atas. Pilih foto JPG/PNG/WebP — sistem otomatis mengecilkan foto ke 512px sebelum menyimpan, sehingga hemat kuota dan cepat. Foto langsung tampil pada bilah samping, pojok kanan atas, dan halaman Akun Saya. Untuk menghapus, tekan tombol Hapus Foto di bawah nama Anda.',
+  },
+  {
     q: 'Saya lupa kata sandi. Bagaimana cara mengatasinya?',
     a: 'Hubungi Superadmin/Kelola Akun di Dinas Kesehatan untuk penataan ulang kata sandi akun Anda. Setelah kata sandi baru diberikan, masuk ulang lalu segera ganti sendiri melalui menu Akun Saya → Profil dan Keamanan demi keamanan.',
   },

@@ -29,6 +29,12 @@ model User {
   jabatan       String?
   instansi      String?
   telepon       String?
+  // v2.3 — foto profil akun: disimpan sebagai BYTEA di database (pola sama
+  // dengan DokumenPengajuan; filesystem Vercel bersifat sementara, database
+  // persisten). Gambar dikecilkan di sisi peramban maks. 512px JPEG.
+  foto      Bytes?
+  fotoTipe  String? // image/jpeg | image/png | image/webp
+  fotoPada  DateTime? // waktu unggah terakhir — penanda versi cache avatar
   isActive      Boolean      @default(true)
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt

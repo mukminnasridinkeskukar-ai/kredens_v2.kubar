@@ -31,6 +31,7 @@ import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { keluarKeSitusUtama } from '@/lib/keluar'
 import { PengamanLayar } from '@/components/kredens/pengaman-layar'
+import { AvatarPengguna } from '@/components/kredens/avatar-pengguna'
 import {
   Collapsible,
   CollapsibleContent,
@@ -220,6 +221,8 @@ function SidebarContent({
   userEmail,
   peranEkstra,
   profesi,
+  fotoAda,
+  fotoVersi,
   onNavigate,
 }: {
   role: string
@@ -227,6 +230,8 @@ function SidebarContent({
   userEmail: string
   peranEkstra?: string | null
   profesi?: string | null
+  fotoAda?: boolean
+  fotoVersi?: number | null
   onNavigate?: () => void
 }) {
   const isAsesi = role === 'ASESI'
@@ -256,24 +261,32 @@ function SidebarContent({
   return (
     <div className="flex h-full flex-col">
       <Brand />
-      <div className="mx-4 mb-3 rounded-lg border bg-sidebar-accent/50 px-3 py-2.5">
-        <p className="truncate text-sm font-semibold text-foreground">{userNama}</p>
-        <p className="truncate text-xs text-muted-foreground">
-          {labelPeranLengkap(role, profesi)}
-        </p>
-        {ekstra.length > 0 && (
-          <div className="mt-1.5 flex flex-wrap gap-1">
-            {ekstra.map((r) => (
-              <span
-                key={r}
-                className="rounded border border-dashed px-1.5 py-0.5 text-[10px] font-medium leading-tight text-muted-foreground"
-              >
-                + {PERAN_EKSTRA_LABELS[r] ?? r}
-              </span>
-            ))}
-          </div>
-        )}
+      {/* v2.3 — kartu identitas kini menampilkan foto profil (bila diunggah) */}
+      <div className="mx-4 mb-3 flex items-center gap-2.5 rounded-lg border bg-sidebar-accent/50 px-3 py-2.5">
+        <AvatarPengguna
+          nama={userNama}
+          src={fotoAda && fotoVersi ? `/api/akun/foto?v=${fotoVersi}` : null}
+          className="h-10 w-10 text-sm"
+        />
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm font-semibold text-foreground">{userNama}</p>
+          <p className="truncate text-xs text-muted-foreground">
+            {labelPeranLengkap(role, profesi)}
+          </p>
+        </div>
       </div>
+      {ekstra.length > 0 && (
+        <div className="mx-4 mb-3 flex flex-wrap gap-1">
+          {ekstra.map((r) => (
+            <span
+              key={r}
+              className="rounded border border-dashed px-1.5 py-0.5 text-[10px] font-medium leading-tight text-muted-foreground"
+            >
+              + {PERAN_EKSTRA_LABELS[r] ?? r}
+            </span>
+          ))}
+        </div>
+      )}
       <nav className="flex-1 space-y-1 overflow-y-auto px-4 pb-4" aria-label="Navigasi utama">
         {navUtama.map((item) =>
           'items' in item ? (
@@ -336,6 +349,8 @@ export function AppShell({
   userEmail,
   peranEkstra,
   profesi,
+  fotoAda,
+  fotoVersi,
 }: {
   children: React.ReactNode
   role: string
@@ -343,9 +358,13 @@ export function AppShell({
   userEmail: string
   peranEkstra?: string | null
   profesi?: string | null
+  fotoAda?: boolean
+  fotoVersi?: number | null
 }) {
   const [mobileOpen, setMobileOpen] = useState(false)
   const router = useRouter()
+  // v2.3 — URL foto profil untuk avatar (dengan versi agar cache peramban segar)
+  const fotoSrc = fotoAda && fotoVersi ? `/api/akun/foto?v=${fotoVersi}` : null
 
   return (
     <div className="flex min-h-screen bg-muted/40">
@@ -359,6 +378,8 @@ export function AppShell({
           userEmail={userEmail}
           peranEkstra={peranEkstra}
           profesi={profesi}
+          fotoAda={fotoAda}
+          fotoVersi={fotoVersi}
         />
       </aside>
 
@@ -382,6 +403,8 @@ export function AppShell({
           userEmail={userEmail}
           peranEkstra={peranEkstra}
           profesi={profesi}
+          fotoAda={fotoAda}
+          fotoVersi={fotoVersi}
           onNavigate={() => setMobileOpen(false)}
         />
       </aside>
@@ -405,9 +428,7 @@ export function AppShell({
             </p>
           </div>
           <div className="hidden items-center gap-2 rounded-full border bg-card px-3 py-1.5 sm:flex">
-            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
-              {userNama?.slice(0, 1).toUpperCase() ?? 'A'}
-            </div>
+            <AvatarPengguna nama={userNama ?? 'A'} src={fotoSrc} className="h-7 w-7 text-[11px]" />
             <div className="max-w-[180px]">
               <p className="truncate text-xs font-semibold">{userNama}</p>
             </div>
