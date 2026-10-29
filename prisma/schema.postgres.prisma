@@ -1,0 +1,351 @@
+// ============================================================
+// KREDENS - Tata Kelola Kredensial Tenaga Medis dan Tenaga
+// Kesehatan Kabupaten Kutai Barat
+// Schema: PostgreSQL (Neon) — production. Mirrors schema.prisma.
+
+// ============================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String       @id @default(cuid())
+  email         String       @unique
+  passwordHash  String
+  sandiTersimpan String? // salinan sandi terenkripsi AES-256-GCM (v1.3.0, dibaca superadmin)
+  nama          String
+  role          String // ASESI | ASESOR | OPERATOR_KREDENSIAL | KETUA_TIM_KREDENSIAL | MITRA_BESTARI | PIMPINAN_FASYANKES | KEPALA_DINAS_KESEHATAN
+  // v2.1 — fungsi tambahan satu akun (dipisah koma): ASESOR | PIMPINAN_FASYANKES | KETUA_TIM_KREDENSIAL
+  peranEkstra   String?
+  // v2.1 — profesi ketua tim kredensial (Dokter, Perawat, Bidan, dst.)
+  profesi       String?
+  nip           String?
+  jabatan       String?
+  instansi      String?
+  telepon       String?
+  isActive      Boolean      @default(true)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  tempatKerjaId String?
+  tempatKerja   TempatKerja? @relation(fields: [tempatKerjaId], references: [id], onDelete: SetNull)
+
+  asesiProfile    AsesiProfile?
+  pengajuan       Pengajuan[]
+  penugasanAsesor PenugasanAsesor[]
+}
+
+model TempatKerja {
+  id        String   @id @default(cuid())
+  nama      String   @unique
+  alamat    String?
+  aktif     Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  asesi    AsesiProfile[]
+  pengguna User[]
+}
+
+// ============ BIODATA ASESI (sheet: RIWAYAT HIDUP) ============
+model AsesiProfile {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // I. DATA PRIBADI
+  namaLengkapGelar  String?
+  tempatLahir       String?
+  tanggalLahir      String?
+  nip               String?
+  nik               String?
+  jenisProfesi      String?
+  levelKompetensi   String?
+  jenisKelamin      String?
+  alamat            String?
+  telepon           String?
+  email             String?
+  statusKepegawaian String?
+  jenjangJabatan    String?
+  tempatBekerja     String?
+  tempatKerjaId     String?
+  tempatKerja       TempatKerja? @relation(fields: [tempatKerjaId], references: [id], onDelete: SetNull)
+
+  pendidikan RiwayatPendidikan[]
+  pengalaman PengalamanKerja[]
+  pelatihan  PelatihanKompetensi[]
+}
+
+model RiwayatPendidikan {
+  id            String       @id @default(cuid())
+  asesi         AsesiProfile @relation(fields: [asesiId], references: [id], onDelete: Cascade)
+  asesiId       String
+  jenjang       String
+  namaInstitusi String
+  tahun         String?
+  nomorIjazah   String?
+  urutan        Int          @default(0)
+}
+
+model PengalamanKerja {
+  id             String       @id @default(cuid())
+  asesi          AsesiProfile @relation(fields: [asesiId], references: [id], onDelete: Cascade)
+  asesiId        String
+  tempatKerja    String
+  jabatan        String
+  periodeMulai   String?
+  periodeSelesai String?
+  masihBekerja   Boolean      @default(false)
+  urutan         Int          @default(0)
+}
+
+model PelatihanKompetensi {
+  id              String       @id @default(cuid())
+  asesi           AsesiProfile @relation(fields: [asesiId], references: [id], onDelete: Cascade)
+  asesiId         String
+  namaKegiatan    String
+  penyelenggara   String?
+  tahun           String?
+  jumlahJp        String?
+  nomorSertifikat String?
+  urutan          Int          @default(0)
+}
+
+// ============ PENGAJUAN KREDENSIAL ============
+model Pengajuan {
+  id     String @id @default(cuid())
+  kode   String @unique
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // DRAFT | DIAJUKAN | VERIFIKASI | PENILAIAN_TIM | REKOMENDASI_TIM | KETETAPAN_KADIS | SURAT_PENUGASAN | SELESAI
+  status      String    @default("DRAFT")
+  // KREDENSIAL | REKREDENSIAL
+  jenis       String    @default("KREDENSIAL")
+  fasyankes   String?
+  submittedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  formulir         FormulirKredensial?
+  kewenangan       KewenanganKlinis[]
+  rekomendasiTim   RekomendasiTim?
+  rekomendasiKadis RekomendasiKadis?
+  spk              SuratPenugasanKlinis?
+  jadwal           JadwalKredensial[]
+  riwayat          RiwayatStatus[]
+  penugasanAsesor  PenugasanAsesor[]
+  logbook          LogbookBulanan[]
+  dokumen          DokumenPengajuan[]
+}
+
+// sheet: FORMULIR
+model FormulirKredensial {
+  id                     String    @id @default(cuid())
+  pengajuan              Pengajuan @relation(fields: [pengajuanId], references: [id], onDelete: Cascade)
+  pengajuanId            String    @unique
+  pernyataan             Boolean   @default(false)
+  strNomor               String?
+  strBerlaku             String?
+  sipNomor               String?
+  sipBerlaku             String?
+  suratPermohonanNomor   String?
+  suratPermohonanTanggal String?
+  // Sertifikasi
+  ptNomor                String?
+  ptTanggal              String?
+  kolegiumNomor          String?
+  kolegiumTanggal        String?
+  ujiKompetensiNomor     String?
+  ujiKompetensiTanggal   String?
+}
+
+// sheet: RINCIAN KEWENANGAN KLINIS
+model KewenanganKlinis {
+  id                 String    @id @default(cuid())
+  pengajuan          Pengajuan @relation(fields: [pengajuanId], references: [id], onDelete: Cascade)
+  pengajuanId        String
+  urutan             Int       @default(0)
+  kodeRef            String? // kode dari daftar Kewenangan Klinis Dinkes Kubar
+  namaKewenangan     String // daftar diagnosa / keterampilan
+  kodeDiminta        String // 1=Kompeten sepenuhnya, 2=Perlu supervisi, 3=Di luar kompetensi, 4=Fasilitas tidak tersedia
+  kodeRekomendasi    String? // 1=Disetujui penuh, 2=Disetujui dg supervisi, 3=Tidak disetujui (kompetensi), 4=Tidak disetujui (fasilitas)
+  catatanRekomendasi String?
+}
+
+// Template Daftar Kewenangan Klinis standar Dinkes Kubar (per profesi)
+// Sumber: RINCIAN KEWENANGAN KLINIS REVISI BARU.xlsx
+model KewenanganTemplate {
+  id       String  @id @default(cuid())
+  profesi  String // Dokter | Dokter Gigi | Perawat | Bidan (sesuai JENIS_PROFESI)
+  kode     String // TD.001 / TDG.001 / D.0001 / TK.0001 / Q.86KEB01.xxx.1
+  nama     String
+  detail   String? // sub-rincian bullet (mis. enumerasi diagnosis dokter gigi)
+  kategori String? // Diagnosa Keperawatan | Tindakan Keperawatan (Perawat)
+  urutan   Int     @default(0)
+
+  @@unique([profesi, kode])
+  @@index([profesi])
+}
+
+// sheet: REKOMENDASI TIM (read-only utk asesi)
+model RekomendasiTim {
+  id                     String    @id @default(cuid())
+  pengajuan              Pengajuan @relation(fields: [pengajuanId], references: [id], onDelete: Cascade)
+  pengajuanId            String    @unique
+  kesimpulan             String // DIREKOMENDASIKAN | DIREKOMENDASIKAN_DENGAN_CATATAN | TIDAK_DIREKOMENDASIKAN | DILANJUTKAN | DITAMBAH | DIKURANGI | DIBEKUKAN | DIUBAH | DIAKHIRI
+  tanggal                String?
+  catatan                String?
+  simpulan               String?
+  ketuaNama              String?
+  anggotaNama            String?
+  // v2.1 — dua nama asesor lain sebagai anggota tim (perwakilan penilai)
+  anggotaNama2           String?
+  anggotaNama3           String?
+  penetapanNomor         String?
+  penetapanTanggal       String?
+  penetapanBerlakuSampai String?
+}
+
+// sheet: REKOMENDASI KADIS + LAMPIRAN REKOM KADIS (read-only utk asesi)
+model RekomendasiKadis {
+  id                     String    @id @default(cuid())
+  pengajuan              Pengajuan @relation(fields: [pengajuanId], references: [id], onDelete: Cascade)
+  pengajuanId            String    @unique
+  nomorSurat             String?
+  tanggalSurat           String?
+  sifat                  String    @default("Biasa")
+  lampiran               String    @default("1 (satu) Berkas")
+  hal                    String    @default("Rekomendasi Penetapan Kewenangan Klinis")
+  refSuratNomor          String? // surat permohonan dari UPTD
+  refSuratTanggal        String?
+  tujuanUptd             String?
+  tempat                 String?
+  ketetapanNomor         String?
+  ketetapanTanggal       String?
+  ketetapanBerlakuSampai String?
+  catatan                String?
+}
+
+// sheet: SURAT PENUGASAN KLINIS (read-only utk asesi)
+model SuratPenugasanKlinis {
+  id                String    @id @default(cuid())
+  pengajuan         Pengajuan @relation(fields: [pengajuanId], references: [id], onDelete: Cascade)
+  pengajuanId       String    @unique
+  nomorSpk          String?
+  tanggalSpk        String?
+  uptd              String?
+  nomorSkKewenangan String?
+  berlakuSampai     String?
+  kepalaUptd        String?
+}
+
+model JadwalKredensial {
+  id          String     @id @default(cuid())
+  pengajuan   Pengajuan? @relation(fields: [pengajuanId], references: [id])
+  pengajuanId String?
+  tanggal     String
+  waktu       String?
+  tempat      String?
+  tahap       String // TELAAH_BERKAS | ASESMEN | PENILAIAN_LAPANGAN | REKOMENDASI | KETETAPAN
+  keterangan  String?
+  status      String     @default("TERJADWAL") // TERJADWAL | SELESAI | DIBATALKAN
+  createdAt   DateTime   @default(now())
+}
+
+model RiwayatStatus {
+  id          String    @id @default(cuid())
+  pengajuan   Pengajuan @relation(fields: [pengajuanId], references: [id], onDelete: Cascade)
+  pengajuanId String
+  status      String
+  keterangan  String?
+  oleh        String?
+  createdAt   DateTime  @default(now())
+}
+
+// Penetapan tiga asesor penilai oleh Operator saat verifikasi berkas
+// dinyatakan lengkap. Hanya asesor yang tercatat di sini yang dapat
+// melakukan penilaian kewenangan klinis pada pengajuan terkait.
+model PenugasanAsesor {
+  id             String    @id @default(cuid())
+  pengajuan      Pengajuan @relation(fields: [pengajuanId], references: [id], onDelete: Cascade)
+  pengajuanId    String
+  asesor         User      @relation(fields: [asesorId], references: [id], onDelete: Cascade)
+  asesorId       String
+  ditetapkanOleh String? // nama operator yang menetapkan
+  createdAt      DateTime  @default(now())
+
+  @@unique([pengajuanId, asesorId])
+  @@index([asesorId])
+}
+
+// ============ LOGBOOK KEWENANGAN KLINIS ============
+// Laporan kegiatan bulanan asesi atas kewenangan klinis yang telah
+// disetujui tim kredensial (kodeRekomendasi 1 atau 2). Isian berbentuk
+// cek list harian; laporan bulanan wajib diverifikasi pimpinan fasyankes
+// tempat asesi bertugas.
+model LogbookBulanan {
+  id          String    @id @default(cuid())
+  pengajuan   Pengajuan @relation(fields: [pengajuanId], references: [id], onDelete: Cascade)
+  pengajuanId String
+  bulan       Int // 1..12 (Januari = 1)
+  tahun       Int
+
+  // DRAFT | DIAJUKAN | DIVERIFIKASI | REVISI
+  status           String    @default("DRAFT")
+  catatanPimpinan  String? // catatan pimpinan saat verifikasi / minta revisi
+  diverifikasiOleh String? // nama pimpinan fasyankes
+  diverifikasiPada DateTime?
+  submittedAt      DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  entri LogbookEntri[]
+
+  @@unique([pengajuanId, bulan, tahun])
+  @@index([pengajuanId])
+}
+
+// Cek list harian: satu baris = pada tanggal X asesi melaksanakan
+// kewenangan Y (dengan jumlah kasus & catatan opsional).
+model LogbookEntri {
+  id           String         @id @default(cuid())
+  logbook      LogbookBulanan @relation(fields: [logbookId], references: [id], onDelete: Cascade)
+  logbookId    String
+  tanggal      String // yyyy-MM-dd, wajib di dalam periode bulan logbook
+  kewenanganId String // referensi KewenanganKlinis (yang disetujui)
+  jumlahKasus  Int            @default(0)
+  catatan      String?
+  createdAt    DateTime       @default(now())
+
+  @@unique([logbookId, tanggal, kewenanganId])
+  @@index([logbookId])
+}
+
+// ============ DOKUMEN TERUNGGAH (SPK / RKK) ============
+// Pindaian dokumen bertanda tangan yang dilampirkan pada pengajuan:
+//  - SPK : Surat Penugasan Klinis — diunggah pimpinan fasyankes
+//  - RKK : Rincian Kewenangan Klinis — diunggah ketua tim kredensial
+// Disimpan sebagai BLOB agar asesi dapat mengunduhnya langsung dari
+// akunnya (filesystem Vercel bersifat sementara, database persisten).
+model DokumenPengajuan {
+  id           String    @id @default(cuid())
+  pengajuan    Pengajuan @relation(fields: [pengajuanId], references: [id], onDelete: Cascade)
+  pengajuanId  String
+  jenis        String // SPK | RKK
+  namaFile     String
+  tipeFile     String // mime type: application/pdf, image/png, image/jpeg, image/webp
+  ukuran       Int // byte
+  data         Bytes
+  diunggahOleh String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@unique([pengajuanId, jenis])
+  @@index([pengajuanId])
+}
